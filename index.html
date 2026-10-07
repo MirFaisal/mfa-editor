@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MFA Editor — High-Performance Rich Text & HTML Editor by Mir Faisal Ahmad</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- MFA Editor Core Stylesheets -->
+    <link rel="stylesheet" href="assets/css/dashicons.min.css">
+    <link rel="stylesheet" href="assets/css/buttons.min.css">
+    <link rel="stylesheet" href="assets/css/mfa-editor.min.css">
+    
+    <style>
+        :root {
+            --brand-primary: #2563eb;
+            --brand-hover: #1d4ed8;
+            --brand-dark: #0f172a;
+            --bg-canvas: #f8fafc;
+            --surface: #ffffff;
+            --surface-subtle: #f1f5f9;
+            --border-subtle: #e2e8f0;
+            --border-medium: #cbd5e1;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 14px rgba(0,0,0,0.07);
+            --shadow-lg: 0 12px 30px rgba(0,0,0,0.09);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-canvas);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Bar */
+        .site-header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #ffffff;
+            padding: 1.25rem 2rem;
+            box-shadow: 0 2px 12px rgba(15, 23, 42, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .header-title-group {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+        }
+
+        .mfa-badge-logo {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%);
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+        }
+
+        .site-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .site-tagline {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .badge-pill {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .badge-pill::before {
+            content: "";
+            width: 7px;
+            height: 7px;
+            background-color: #10b981;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        /* Main Workspace */
+        .main-container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* Editor Card */
+        .editor-card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-subtle);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .editor-card-header {
+            padding: 1.25rem 1.75rem;
+            border-bottom: 1px solid var(--border-subtle);
+            background: var(--surface-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .editor-card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .editor-card-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.15rem;
+        }
+
+        .action-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .demo-btn {
+            appearance: none;
+            border: 1px solid var(--border-medium);
+            background: #ffffff;
+            color: var(--text-secondary);
+            padding: 0.45rem 0.85rem;
+            font-size: 0.825rem;
+            font-weight: 500;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.15s ease-in-out;
+            font-family: inherit;
+        }
+
+        .demo-btn:hover {
+            background: var(--surface-subtle);
+            color: var(--text-primary);
+            border-color: #94a3b8;
+        }
+
+        .demo-btn.primary {
+            background: var(--brand-primary);
+            color: #ffffff;
+            border-color: var(--brand-primary);
+        }
+
+        .demo-btn.primary:hover {
+            background: var(--brand-hover);
+            border-color: var(--brand-hover);
+        }
+
+        .editor-card-body {
+            padding: 1.5rem;
+        }
+
+        /* Canvas Wrapper adjustments */
+        .mfa-core-ui .mfa-editor-wrap,
+        .wp-core-ui .wp-editor-wrap {
+            margin-bottom: 0 !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+        }
+
+        .mfa-editor-container,
+        .wp-editor-container {
+            border-color: #cbd5e1 !important;
+            border-radius: 0 0 4px 4px;
+        }
+
+        .mfa-switch-editor,
+        .wp-switch-editor {
+            border-color: #cbd5e1 !important;
+            border-bottom: 0 !important;
+            border-radius: 4px 4px 0 0 !important;
+            font-weight: 500;
+        }
+
+        .tmce-active .switch-tmce,
+        .html-active .switch-html {
+            background: #f6f7f7 !important;
+            border-bottom: 1px solid #f6f7f7 !important;
+            color: #1e293b !important;
+        }
+
+        /* Textarea Styling in Text Mode */
+        textarea.mfa-editor-area,
+        textarea.wp-editor-area {
+            font-family: 'JetBrains Mono', Consolas, Monaco, monospace !important;
+            font-size: 13.5px !important;
+            padding: 14px !important;
+            line-height: 1.6 !important;
+            color: #0f172a !important;
+            background: #ffffff !important;
+            min-height: 320px;
+        }
+
+        /* Live Inspector Section */
+        .inspector-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 900px) {
+            .inspector-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel-card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-subtle);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-card-header {
+            padding: 0.85rem 1.25rem;
+            background: var(--surface-subtle);
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .panel-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .panel-content {
+            padding: 1.25rem;
+            flex: 1;
+            min-height: 220px;
+            max-height: 380px;
+            overflow-y: auto;
+        }
+
+        .code-display {
+            background: #0f172a;
+            color: #e2e8f0;
+            font-family: 'JetBrains Mono', Consolas, monospace;
+            font-size: 0.82rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-all;
+            border-radius: 8px;
+            padding: 1rem;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .rendered-preview {
+            background: #ffffff;
+            border: 1px dashed var(--border-medium);
+            border-radius: 8px;
+            padding: 1.25rem;
+            height: 100%;
+            overflow-y: auto;
+            font-family: Georgia, serif;
+            color: #334155;
+            line-height: 1.7;
+        }
+
+        .rendered-preview h1, .rendered-preview h2, .rendered-preview h3 {
+            font-family: 'Inter', sans-serif;
+            color: #0f172a;
+            margin: 0.75rem 0 0.5rem;
+        }
+
+        .rendered-preview p {
+            margin-bottom: 0.85rem;
+        }
+
+        .rendered-preview blockquote {
+            border-left: 4px solid var(--brand-primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .rendered-preview ul, .rendered-preview ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Documentation & Quickstart Card */
+        .guide-card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-subtle);
+            box-shadow: var(--shadow-sm);
+            padding: 1.75rem;
+        }
+
+        .guide-card h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .guide-card p {
+            color: var(--text-secondary);
+            font-size: 0.925rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .code-snippet {
+            background: #1e293b;
+            color: #f1f5f9;
+            padding: 1.25rem;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', Consolas, monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        .code-snippet .keyword { color: #f43f5e; }
+        .code-snippet .string { color: #34d399; }
+        .code-snippet .tag { color: #38bdf8; }
+        .code-snippet .attr { color: #fbbf24; }
+        .code-snippet .comment { color: #94a3b8; font-style: italic; }
+
+        /* Notification Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #0f172a;
+            color: #ffffff;
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Footer */
+        .site-footer {
+            margin-top: auto;
+            background: #ffffff;
+            border-top: 1px solid var(--border-subtle);
+            padding: 1.25rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="site-header">
+        <div class="header-container">
+            <div class="header-title-group">
+                <div class="mfa-badge-logo">MFA</div>
+                <div>
+                    <h1 class="site-title">MFA Editor</h1>
+                    <p class="site-tagline">Created by Mir Faisal Ahmad &bull; High-Performance Visual &amp; HTML Editor</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <span class="badge-pill">NPM: @mirfaisalahmad/editor</span>
+                <span class="badge-pill">Dual-Mode: Visual &amp; Text</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="main-container">
+
+        <!-- Editor Playground Card -->
+        <section class="editor-card">
+            <div class="editor-card-header">
+                <div>
+                    <div class="editor-card-title">
+                        <span class="dashicons dashicons-edit" style="color: var(--brand-primary);"></span>
+                        Live Interactive Editor
+                    </div>
+                    <div class="editor-card-subtitle">
+                        Switch seamlessly between Visual (WYSIWYG) and Text (HTML Code) mode.
+                    </div>
+                </div>
+                <div class="action-toolbar">
+                    <button type="button" class="demo-btn primary" id="btn-sync-preview" title="Update inspector output">
+                        <span class="dashicons dashicons-update"></span> Sync Preview
+                    </button>
+                    <button type="button" class="demo-btn" id="btn-set-sample" title="Insert rich sample text">
+                        <span class="dashicons dashicons-insert"></span> Sample Data
+                    </button>
+                    <button type="button" class="demo-btn" id="btn-toggle-mode" title="Toggle between Visual and Code">
+                        <span class="dashicons dashicons-randomize"></span> Toggle Tab
+                    </button>
+                    <button type="button" class="demo-btn" id="btn-clear" title="Clear all content">
+                        <span class="dashicons dashicons-trash"></span> Clear
+                    </button>
+                </div>
+            </div>
+
+            <div class="editor-card-body">
+                <!-- Target Textarea for MFA Editor -->
+                <textarea id="mfa_editor" class="mfa-editor-area wp-editor-area" rows="18" style="width: 100%;">
+<h2>Welcome to MFA Editor!</h2>
+<p>Developed by <strong>Mir Faisal Ahmad</strong>, <strong>MFA Editor</strong> is a standalone, dual-mode visual and code rich text editor built to be easily integrated into any modern web project or application.</p>
+<blockquote>
+<p>“Simplicity is prerequisite for reliability.” — Edsger W. Dijkstra</p>
+</blockquote>
+<h3>Key Capabilities:</h3>
+<ul>
+    <li><strong>Dual-Mode Editing:</strong> Seamlessly toggle between <em>Visual Mode</em> (WYSIWYG formatting) and <em>Text / Code Mode</em>.</li>
+    <li><strong>Rich Toolbar Controls:</strong> Format headings, lists, quotes, alignment, colors, strikethrough, and toolbar toggle.</li>
+    <li><strong>100% Client-Side:</strong> Operates entirely in the browser with zero external server dependencies.</li>
+    <li><strong>NPM &amp; GitHub Ready:</strong> Package as <code>@mirfaisalahmad/editor</code> or drop into any framework.</li>
+</ul>
+<p>Feel free to edit this content, customize styles, and click <strong>Sync Preview</strong> above to test the real-time API!</p>
+                </textarea>
+            </div>
+        </section>
+
+        <!-- Inspector Grid -->
+        <section class="inspector-grid">
+            <!-- Raw HTML Code Output -->
+            <div class="panel-card">
+                <div class="panel-card-header">
+                    <div class="panel-title">
+                        <span class="dashicons dashicons-editor-code" style="color: #6366f1;"></span>
+                        Extracted HTML Output (<code>MFAEditor.getContent()</code>)
+                    </div>
+                    <button type="button" class="demo-btn" id="btn-copy-html">
+                        <span class="dashicons dashicons-clipboard"></span> Copy HTML
+                    </button>
+                </div>
+                <div class="panel-content">
+                    <pre class="code-display" id="html_output_display">&lt;!-- Click 'Sync Preview' or type in the editor --&gt;</pre>
+                </div>
+            </div>
+
+            <!-- Rendered Output Preview -->
+            <div class="panel-card">
+                <div class="panel-card-header">
+                    <div class="panel-title">
+                        <span class="dashicons dashicons-visibility" style="color: #10b981;"></span>
+                        Rendered Live Preview
+                    </div>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">Real-time HTML render</span>
+                </div>
+                <div class="panel-content">
+                    <div class="rendered-preview" id="rendered_output_display">
+                        <em>Preview will appear here...</em>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Integration Guide -->
+        <section class="guide-card">
+            <h3>How to Use MFA Editor in Any Project</h3>
+            <p>You can copy the <code>assets/</code> folder or install via NPM (<code>@mirfaisalahmad/editor</code>) into any project (React, Vue, Next.js, Laravel, Django, Node, or plain HTML):</p>
+
+            <div class="code-snippet">
+<span class="comment">&lt;!-- 1. Include MFA Editor Stylesheets --&gt;</span>
+<span class="tag">&lt;link</span> <span class="attr">rel=</span><span class="string">"stylesheet"</span> <span class="attr">href=</span><span class="string">"assets/css/dashicons.min.css"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;link</span> <span class="attr">rel=</span><span class="string">"stylesheet"</span> <span class="attr">href=</span><span class="string">"assets/css/buttons.min.css"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;link</span> <span class="attr">rel=</span><span class="string">"stylesheet"</span> <span class="attr">href=</span><span class="string">"assets/css/mfa-editor.min.css"</span><span class="tag">&gt;</span>
+
+<span class="comment">&lt;!-- 2. Target Textarea --&gt;</span>
+<span class="tag">&lt;textarea</span> <span class="attr">id=</span><span class="string">"my_editor"</span> <span class="attr">class=</span><span class="string">"mfa-editor-area"</span> <span class="attr">name=</span><span class="string">"my_editor"</span><span class="tag">&gt;</span>Initial content here...<span class="tag">&lt;/textarea&gt;</span>
+
+<span class="comment">&lt;!-- 3. Include JavaScript Modules --&gt;</span>
+<span class="tag">&lt;script</span> <span class="attr">src=</span><span class="string">"assets/js/jquery.min.js"</span><span class="tag">&gt;&lt;/script&gt;</span>
+<span class="tag">&lt;script</span> <span class="attr">src=</span><span class="string">"assets/js/mfa-editor.js"</span><span class="tag">&gt;&lt;/script&gt;</span>
+<span class="tag">&lt;script</span> <span class="attr">src=</span><span class="string">"assets/js/tinymce/wp-tinymce.js"</span><span class="tag">&gt;&lt;/script&gt;</span>
+<span class="tag">&lt;script</span> <span class="attr">src=</span><span class="string">"assets/js/quicktags.min.js"</span><span class="tag">&gt;&lt;/script&gt;</span>
+
+<span class="comment">&lt;!-- 4. Initialize with MFAEditor API --&gt;</span>
+<span class="tag">&lt;script&gt;</span>
+$(document).ready(<span class="keyword">function</span>() {
+    MFAEditor.init(<span class="string">'my_editor'</span>, {
+        tinymce: <span class="keyword">true</span>,
+        quicktags: <span class="keyword">true</span>
+    });
+});
+<span class="tag">&lt;/script&gt;</span>
+            </div>
+
+            <p style="margin-bottom: 0;"><strong>JavaScript API Reference:</strong></p>
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.875rem;">
+                <li><code>MFAEditor.getContent('my_editor')</code> &mdash; Returns current HTML string.</li>
+                <li><code>MFAEditor.setContent('my_editor', html)</code> &mdash; Updates content in visual and text tabs.</li>
+                <li><code>MFAEditor.switchTab('my_editor', 'tmce' | 'html')</code> &mdash; Programmatically switches tabs.</li>
+                <li><code>MFAEditor.remove('my_editor')</code> &mdash; Destroys editor instance cleanly.</li>
+            </ul>
+        </section>
+
+    </main>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast-msg">
+        <span class="dashicons dashicons-yes-alt" style="color: #10b981;"></span>
+        <span id="toast-text">Action completed</span>
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        MFA Editor &bull; Created by Mir Faisal Ahmad &bull; v1.0.0
+    </footer>
+
+    <!-- Standalone Polyfills for Editor Core -->
+    <script>
+        window.getUserSetting = window.getUserSetting || function(name, def) { return typeof def !== 'undefined' ? def : ''; };
+        window.setUserSetting = window.setUserSetting || function(name, value) { return value; };
+        window.quicktagsL10n = window.quicktagsL10n || {
+            closeAllOpenTags: 'Close all open tags',
+            closeTags: 'close tags',
+            enterURL: 'Enter the URL',
+            enterImageURL: 'Enter the URL of the image',
+            enterImageDescription: 'Enter a description of the image',
+            textdirection: 'text direction',
+            toggleTextdirection: 'Switch Editor Text Direction',
+            dfw: 'Distraction-free writing mode',
+            strong: 'Bold',
+            strongClose: 'Close bold tag',
+            em: 'Italic',
+            emClose: 'Close italic tag',
+            link: 'Insert link',
+            blockquote: 'Blockquote',
+            blockquoteClose: 'Close blockquote tag',
+            del: 'Deleted text (strikethrough)',
+            delClose: 'Close deleted text tag',
+            ins: 'Inserted text',
+            insClose: 'Close inserted text tag',
+            image: 'Insert image',
+            ul: 'Bulleted list',
+            ulClose: 'Close bulleted list tag',
+            ol: 'Numbered list',
+            olClose: 'Close numbered list tag',
+            li: 'List item',
+            liClose: 'Close list item tag',
+            code: 'Code',
+            codeClose: 'Close code tag',
+            more: 'Insert Read More tag'
+        };
+    </script>
+
+    <!-- Scripts: Required Order -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/mfa-editor.js?v=1.0.3"></script>
+    <script src="assets/js/tinymce/wp-tinymce.js"></script>
+    <script src="assets/js/quicktags.min.js"></script>
+
+    <!-- Playground Interactive Logic -->
+    <script>
+        (function($) {
+            'use strict';
+
+            var editorId = 'mfa_editor';
+
+            function showToast(message) {
+                var $toast = $('#toast-msg');
+                $('#toast-text').text(message);
+                $toast.addClass('show');
+                setTimeout(function() {
+                    $toast.removeClass('show');
+                }, 2400);
+            }
+
+            function updateOutputs() {
+                var content = MFAEditor.getContent(editorId) || '';
+                $('#html_output_display').text(content);
+                $('#rendered_output_display').html(content);
+            }
+
+            $(document).ready(function() {
+                // Initialize MFA Editor
+                MFAEditor.init(editorId, {
+                    tinymce: {
+                        wpautop: true,
+                        plugins: 'charmap,colorpicker,hr,lists,paste,tabfocus,textcolor,fullscreen,wordpress,wpautoresize,wptextpattern',
+                        toolbar1: 'formatselect,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,fullscreen,wp_adv',
+                        toolbar2: 'strikethrough,hr,forecolor,pastetext,removeformat,charmap,outdent,indent,undo,redo',
+                        setup: function(ed) {
+                            ed.on('init', function() {
+                                updateOutputs();
+                            });
+                            ed.on('change keyup paste', function() {
+                                updateOutputs();
+                            });
+                        }
+                    },
+                    quicktags: {
+                        buttons: 'strong,em,link,block,del,ins,img,ul,ol,li,code,more,close'
+                    }
+                });
+
+                // Update on raw textarea changes (in Text mode)
+                $('#' + editorId).on('input change', function() {
+                    updateOutputs();
+                });
+
+                // Button: Sync Preview
+                $('#btn-sync-preview').on('click', function() {
+                    updateOutputs();
+                    showToast('Preview synchronized with editor content!');
+                });
+
+                // Button: Sample Data
+                $('#btn-set-sample').on('click', function() {
+                    var sample = '<h2>Sample Document Title</h2>\n' +
+                                 '<p>This document was edited in <strong>MFA Editor</strong> by <em>Mir Faisal Ahmad</em>.</p>\n' +
+                                 '<ul>\n' +
+                                 '    <li>Item One: Clean UI and responsive tabs</li>\n' +
+                                 '    <li>Item Two: Independent runtime, zero server dependencies</li>\n' +
+                                 '    <li>Item Three: Seamless NPM and GitHub package export</li>\n' +
+                                 '</ul>\n' +
+                                 '<blockquote><p>Everything should be made as simple as possible, but not simpler.</p></blockquote>';
+                    MFAEditor.setContent(editorId, sample);
+                    updateOutputs();
+                    showToast('Sample content loaded!');
+                });
+
+                // Button: Toggle Mode (Visual <-> Code)
+                $('#btn-toggle-mode').on('click', function() {
+                    MFAEditor.switchTab(editorId, 'toggle');
+                    showToast('Switched editor mode!');
+                });
+
+                // Button: Clear
+                $('#btn-clear').on('click', function() {
+                    if (confirm('Are you sure you want to clear the editor?')) {
+                        MFAEditor.setContent(editorId, '');
+                        updateOutputs();
+                        showToast('Editor cleared!');
+                    }
+                });
+
+                // Button: Copy HTML
+                $('#btn-copy-html').on('click', function() {
+                    var content = MFAEditor.getContent(editorId) || '';
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(content).then(function() {
+                            showToast('HTML copied to clipboard!');
+                        });
+                    } else {
+                        var temp = $('<textarea>');
+                        $('body').append(temp);
+                        temp.val(content).select();
+                        document.execCommand('copy');
+                        temp.remove();
+                        showToast('HTML copied to clipboard!');
+                    }
+                });
+            });
+
+        })(jQuery);
+    </script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+{
+  "name": "@mirfaisalahmad/editor",
+  "version": "1.0.0",
+  "description": "MFA Editor - High-performance, dual-mode Visual & HTML Rich Text Editor by Mir Faisal Ahmad",
+  "main": "assets/js/mfa-editor.js",
+  "style": "assets/css/mfa-editor.min.css",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mirfaisalahmad/mfa-editor.git"
+  },
+  "keywords": [
+    "mfa-editor",
+    "rich-text-editor",
+    "wysiwyg",
+    "html-editor",
+    "tinymce",
+    "quicktags",
+    "mir-faisal-ahmad"
+  ],
+  "author": "Mir Faisal Ahmad",
+  "license": "MIT",
+  "files": [
+    "assets",
+    "index.html",
+    "README.md"
+  ]
+}
