@@ -4,7 +4,7 @@
 > Created and maintained by **Mir Faisal Ahmad**  
 > Package: `@mirfaisalahmad/editor`
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](package.json)
+[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](package.json)
 [![Author](https://img.shields.io/badge/author-Mir%20Faisal%20Ahmad-emerald.svg)](https://github.com/mirfaisalahmad)
 [![License](https://img.shields.io/badge/license-GPL--2.0--or--later-blue.svg)](LICENSE)
 
@@ -17,11 +17,12 @@ It has zero backend dependencies, requires no server-side runtime or database, a
 ## ✨ Features
 
 - ⚡ **Dual-Mode Editing:** Seamlessly toggle between **Visual Mode** (rich formatting toolbar) and **Text Mode** (raw HTML editing with Quicktags).
+- 🖼️ **Full Image Suite:** Insert images from URL or local file picker, paste or drag & drop. Interactive corner drag-to-resize, floating inline alignment toolbar (left, center, right, none), and figure captions.
 - 🎨 **Modern Formatting Suite:** Headings, blockquotes, ordered/unordered lists, text alignment, colors, strikethrough, links, special characters, and code formatting.
 - 🎛️ **Expandable Toolbars:** Built-in multi-tier toolbar toggle for clean and distraction-free writing.
-- 📦 **Zero Backend Overhead:** 100% client-side execution in vanilla JavaScript.
+- 📦 **Zero Backend Overhead:** 100% client-side execution in vanilla JavaScript with native Data URL support.
 - 🚀 **Framework Agnostic:** Easily mounts onto standard `<textarea>` elements in any frontend ecosystem.
-- 🔌 **Extensible API:** Full programmatic control to retrieve HTML, update content, switch modes, and bind event handlers.
+- 🔌 **Extensible API:** Full programmatic control to retrieve HTML, update content, insert images, switch modes, and bind event handlers.
 
 ---
 
@@ -87,8 +88,13 @@ $(document).ready(function() {
     MFAEditor.init('my_editor', {
         tinymce: {
             wpautop: true,
-            toolbar1: 'formatselect,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,fullscreen,wp_adv',
-            toolbar2: 'strikethrough,hr,forecolor,pastetext,removeformat,charmap,outdent,indent,undo,redo'
+            plugins: 'charmap,colorpicker,hr,lists,paste,tabfocus,textcolor,fullscreen,wordpress,wpautoresize,wptextpattern,link,image,wpeditimage',
+            toolbar1: 'formatselect,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,image,fullscreen,wp_adv',
+            toolbar2: 'strikethrough,hr,forecolor,pastetext,removeformat,charmap,outdent,indent,undo,redo',
+            image_advtab: true,
+            image_caption: true,
+            image_dimensions: true,
+            paste_data_images: true
         },
         quicktags: {
             buttons: 'strong,em,link,block,del,ins,img,ul,ol,li,code,more,close'
@@ -117,6 +123,20 @@ Updates the editor content programmatically across both Visual and Code views:
 MFAEditor.setContent('my_editor', '<h2>New Heading</h2><p>Updated content body.</p>');
 ```
 
+### Insert Image Programmatically
+Inserts an image element or captioned figure with custom dimensions and alignment:
+```javascript
+MFAEditor.insertImage('my_editor', {
+    url: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=600',
+    alt: 'Scenic Artwork',
+    title: 'Artwork Title',
+    width: 500,
+    height: 320,
+    align: 'center',      // 'left' | 'center' | 'right' | 'none'
+    caption: 'Figure caption displayed beneath image'
+});
+```
+
 ### Switch Editing Tabs
 Toggles or specifies the active mode (`'tmce'` for Visual, `'html'` for Code):
 ```javascript
@@ -138,29 +158,18 @@ MFAEditor.remove('my_editor');
 
 ---
 
-## 🖼️ Image Upload & Asset Management
+## 🖼️ Image Alignment & Resize Controls
 
-For handling custom image uploads (e.g., S3, Cloudinary, or a custom API endpoint), connect a file input or drag-and-drop handler to `MFAEditor`:
-
-```javascript
-function uploadImageAndInsert(file) {
-    const formData = new FormData();
-    formData.append('image', file);
-
-    fetch('/api/upload', {
-        method: 'POST',
-        body: formData
-    })
-    .then(res => res.json())
-    .then(data => {
-        // Insert uploaded image directly into the editor
-        const currentHtml = MFAEditor.getContent('my_editor');
-        const imgTag = `<img src="${data.url}" alt="${file.name}" style="max-width:100%; height:auto;" />`;
-        MFAEditor.setContent('my_editor', currentHtml + imgTag);
-    })
-    .catch(err => console.error('Upload failed:', err));
-}
-```
+When an image is placed in **Visual Mode**:
+1. **Interactive Drag Handles:** Clicking the image reveals corner drag handles allowing real-time, aspect-ratio preserved scaling.
+2. **Contextual Floating Toolbar:** Selecting the image opens a floating toolbar directly above the graphic with:
+   - **Align Left** (`.alignleft`)
+   - **Align Center** (`.aligncenter`)
+   - **Align Right** (`.alignright`)
+   - **No Alignment**
+   - **Edit Image Modal** (edit dimensions, source, alternate text, and title)
+   - **Delete Image**
+3. **Local File Uploads:** Clicking the image button in the toolbar opens the modal dialog with a local file picker (`FileReader` converting to base64 Data URLs with 0 server requirements). Custom upload endpoints can easily be connected via `file_picker_callback` or `images_upload_handler`.
 
 ---
 

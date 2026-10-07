@@ -1362,13 +1362,43 @@ window.wp = window.wp || {};
 				preview_styles: 'font-family font-size font-weight font-style text-decoration text-transform',
 				end_container_on_empty_block: true,
 				content_css: scriptBase + '/../../css/dashicons.min.css,' + scriptBase + '/skins/wordpress/wp-content.css',
-				plugins: 'charmap,colorpicker,hr,lists,paste,tabfocus,textcolor,fullscreen,wordpress,wpautoresize,wptextpattern,link',
-				toolbar1: 'formatselect,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,fullscreen,wp_adv',
+				plugins: 'charmap,colorpicker,hr,lists,paste,tabfocus,textcolor,fullscreen,wordpress,wpautoresize,wptextpattern,link,image,wpeditimage',
+				toolbar1: 'formatselect,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,image,fullscreen,wp_adv',
 				toolbar2: 'strikethrough,hr,forecolor,pastetext,removeformat,charmap,outdent,indent,undo,redo',
 				toolbar3: '',
 				toolbar4: '',
 				wpautop: true,
-				indent: false
+				indent: false,
+				image_advtab: true,
+				image_caption: true,
+				image_dimensions: true,
+				image_class_list: [
+					{ title: 'None', value: '' },
+					{ title: 'Align Left', value: 'alignleft' },
+					{ title: 'Align Center', value: 'aligncenter' },
+					{ title: 'Align Right', value: 'alignright' }
+				],
+				paste_data_images: true,
+				file_picker_types: 'image',
+				file_picker_callback: function( callback, value, meta ) {
+					if ( meta.filetype === 'image' ) {
+						var input = document.createElement( 'input' );
+						input.setAttribute( 'type', 'file' );
+						input.setAttribute( 'accept', 'image/*' );
+						input.onchange = function() {
+							var file = this.files[0];
+							if ( ! file ) return;
+							var reader = new FileReader();
+							reader.onload = function() {
+								callback( reader.result, {
+									alt: file.name
+								} );
+							};
+							reader.readAsDataURL( file );
+						};
+						input.click();
+					}
+				}
 			},
 			quicktags: {
 				buttons: 'strong,em,link,block,del,ins,img,ul,ol,li,code,more,close'
@@ -1595,6 +1625,47 @@ window.wp = window.wp || {};
 		$( '#' + id ).val( content );
 	};
 
+	/**
+	 * Insert an image programmatically into the editor.
+	 *
+	 * @param {string} id The HTML id of the editor textarea.
+	 * @param {Object} options Image options { url, alt, title, width, height, align, caption }.
+	 */
+	mfa.editor.insertImage = function( id, options ) {
+		if ( ! $ || ! id ) return;
+		options = options || {};
+		var url = options.url || '';
+		if ( ! url ) return;
+
+		var alt = options.alt || '';
+		var title = options.title || '';
+		var width = options.width ? ' width="' + parseInt( options.width, 10 ) + '"' : '';
+		var height = options.height ? ' height="' + parseInt( options.height, 10 ) + '"' : '';
+		var align = options.align || '';
+		var alignClass = ( align && align !== 'none' ) ? ' class="align' + align.replace( 'align', '' ) + '"' : '';
+		var imgHtml = '<img src="' + url + '" alt="' + alt + '"' + ( title ? ' title="' + title + '"' : '' ) + width + height + alignClass + ' />';
+
+		if ( options.caption ) {
+			var figureClass = 'wp-caption' + ( ( align && align !== 'none' ) ? ' align' + align.replace( 'align', '' ) : '' );
+			imgHtml = '<figure class="' + figureClass + '">' + imgHtml + '<figcaption class="wp-caption-text">' + options.caption + '</figcaption></figure>';
+		}
+
+		if ( window.tinymce ) {
+			var editor = window.tinymce.get( id );
+			if ( editor && ! editor.isHidden() ) {
+				editor.insertContent( imgHtml );
+				editor.nodeChanged();
+				return;
+			}
+		}
+
+		var $textarea = $( '#' + id );
+		var val = $textarea.val();
+		$textarea.val( val ? val + '\n' + imgHtml : imgHtml ).trigger( 'change' );
+	};
+
+	wp.editor.insertImage = mfa.editor.insertImage;
+
 	// Link wp.editor bridge for compatibility
 	wp.editor.getDefaultSettings = mfa.editor.getDefaultSettings;
 	wp.editor.initialize = mfa.editor.initialize;
@@ -1617,6 +1688,9 @@ window.wp = window.wp || {};
 		},
 		setContent: function( id, content ) {
 			return mfa.editor.setContent( id, content );
+		},
+		insertImage: function( id, options ) {
+			return mfa.editor.insertImage( id, options );
 		},
 		remove: function( id ) {
 			return mfa.editor.remove( id );

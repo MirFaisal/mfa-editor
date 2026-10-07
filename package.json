@@ -1,6 +1,6 @@
 {
   "name": "@mirfaisalahmad/editor",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "MFA Editor - High-performance, dual-mode Visual & HTML Rich Text Editor by Mir Faisal Ahmad",
   "main": "assets/js/mfa-editor.js",
   "style": "assets/css/mfa-editor.min.css",
