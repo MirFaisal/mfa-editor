@@ -6,7 +6,7 @@
 
 [![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](package.json)
 [![Author](https://img.shields.io/badge/author-Mir%20Faisal%20Ahmad-emerald.svg)](https://github.com/mirfaisalahmad)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![License](https://img.shields.io/badge/license-GPL--2.0--or--later-blue.svg)](LICENSE)
 
 **MFA Editor** is a standalone, browser-native dual-mode rich text editor. It provides a polished **Visual (WYSIWYG)** writing canvas alongside an authentic **HTML / Code** editor tab with seamless state synchronization.
 
@@ -203,4 +203,4 @@ Then visit `http://localhost:5500` to interact with the live editor.
 
 ## 📄 License
 
-This project is open-source and licensed under the [MIT License](LICENSE).
+This project is open-source and licensed under the [GNU General Public License v2.0 or later (GPL-2.0-or-later)](LICENSE), based on upstream WordPress core and TinyMCE components with contributions by Mir Faisal Ahmad.

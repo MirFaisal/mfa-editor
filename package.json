@@ -21,7 +21,7 @@
     "mir-faisal-ahmad"
   ],
   "author": "Mir Faisal Ahmad",
-  "license": "MIT",
+  "license": "GPL-2.0-or-later",
   "files": [
     "assets",
     "index.html",
